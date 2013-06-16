@@ -13,7 +13,7 @@
     <groupId>com.sksamuel.elasticsearch</groupId>
     <artifactId>elasticsearch-river-neo4j</artifactId>
     <packaging>jar</packaging>
-    <version>0.90.1.1</version>
+    <version>0.90.1.0</version>
     <name>elasticsearch-river-neo4j</name>
     <description>A river plugin for elastic search that offers an easy way to index neo4j graph databases</description>
     <url>https://github.com/sksamuel/elasticsearch-river-neo4j</url>
