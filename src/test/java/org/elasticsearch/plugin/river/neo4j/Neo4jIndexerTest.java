@@ -4,6 +4,8 @@ import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.Client;
 import org.junit.Test;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.neo4j.graphdb.Node;
 
 import java.io.IOException;
@@ -38,7 +40,7 @@ public class Neo4jIndexerTest {
     }
 
     @Test
-    public void interruptionKillsThread() throws InterruptedException {
+    public void interruptionOnBlockedKillsThread() throws InterruptedException {
 
         Neo4jIndexer indexer = new Neo4jIndexer(client, "myindex", "mytype", strategy);
 
@@ -46,6 +48,29 @@ public class Neo4jIndexerTest {
         thread.start();
         Thread.sleep(200);         // should be blocked now on empty queue
         thread.interrupt(); // will interrupt block on queue shutting us down
+        thread.join(2000);
+    }
+
+    @Test
+    public void interruptionOnNonBlockedKillsThread() throws InterruptedException, IOException {
+
+        Neo4jIndexer indexer = new Neo4jIndexer(client, "myindex", "mytype", strategy);
+
+        Thread thread = new Thread(indexer);
+        thread.start();
+        for (int k = 0; k < 5; k++) {
+            Node node = mock(Node.class);
+            when(strategy.build("myindex", "mytype", node)).thenAnswer(new Answer<IndexRequest>() {
+
+                @Override
+                public IndexRequest answer(InvocationOnMock invocation) throws Throwable {
+                    Thread.sleep(100);
+                    return null;
+                }
+            });
+            indexer.index(mock(Node.class));
+        }
+        thread.interrupt(); // will interrupt a non blocked process and add posion
         thread.join(2000);
     }
 

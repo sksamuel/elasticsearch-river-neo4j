@@ -66,4 +66,13 @@ public class Neo4jDriverTest {
         driver.close();
         assertTrue(driver.executor.isShutdown());
     }
+
+    @Test
+    public void closingNonStartedRiverShutsDownWithoutException() {
+
+        Map<String, Object> map = new HashMap<String, Object>();
+        RiverSettings settings = new RiverSettings(mock(Settings.class), map);
+        Neo4jDriver driver = new Neo4jDriver(name, settings, "myindex", client);
+        driver.close();
+    }
 }
