@@ -29,11 +29,10 @@ public class Neo4jDriverTest {
         RiverSettings riverSettings = new RiverSettings(globalSettings, map);
         Neo4jDriver driver = new Neo4jDriver(name, riverSettings, "myindex", client);
 
-        assertEquals(7654, driver.getPort());
         assertEquals("time", driver.getTimestampField());
         assertEquals("neoindex", driver.getIndex());
         assertEquals(500, driver.getInterval());
-        assertEquals("1.2.3.4", driver.getHostname());
+        assertEquals("http://192.56.57.89:7888/db/data", driver.getUri());
     }
 
     @Test
@@ -43,8 +42,7 @@ public class Neo4jDriverTest {
         RiverSettings settings = new RiverSettings(mock(Settings.class), map);
         Neo4jDriver driver = new Neo4jDriver(name, settings, "myindex", client);
 
-        assertEquals(Neo4jDriver.DEFAULT_NEO_HOSTNAME, driver.getHostname());
-        assertEquals(Neo4jDriver.DEFAULT_NEO_PORT, driver.getPort());
+        assertEquals(Neo4jDriver.DEFAULT_NEO_URI, driver.getUri());
         assertEquals(Neo4jDriver.DEFAULT_NEO_TIMESTAMP_FIELD, driver.getTimestampField());
         assertEquals(Neo4jDriver.DEFAULT_NEO_INDEX, driver.getIndex());
         assertEquals(Neo4jDriver.DEFAULT_NEO_INTERVAL, driver.getInterval());

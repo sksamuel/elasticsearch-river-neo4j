@@ -1,8 +1,7 @@
 {
     "type": "neo4j",
     "neo4j": {
-        "hostname": "1.2.3.4",
-        "port": 7654,
+        "uri": "http://192.56.57.89:7888/db/data",
         "timestampField": "time",
         "interval": 500
     },

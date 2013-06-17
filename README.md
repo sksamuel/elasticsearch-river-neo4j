@@ -13,8 +13,8 @@ Start the neo4j river by curling a document like the following to the river inde
 
 ```
 curl -XPUT 'http://localhost:9200/_river/my_neo_river/_meta' -d '{
-    "type": "redis",
-    "redis": {
+    "type": "neo4j",
+    "neo4j": {
         "hostname": "NEO4J_HOSTNAME",
         "port" : "NEO4J_PORT_OPTIONAL",
     },
@@ -24,7 +24,7 @@ curl -XPUT 'http://localhost:9200/_river/my_neo_river/_meta' -d '{
 }'
 ```
 
-The following parameters are available in the rediss river document.
+The following parameters are available in the neo4j river document.
 
 | Parameter | Description |
 | ------ | --------- |

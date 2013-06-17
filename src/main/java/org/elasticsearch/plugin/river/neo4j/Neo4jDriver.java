@@ -2,7 +2,6 @@ package org.elasticsearch.plugin.river.neo4j;
 
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.inject.Inject;
-import org.elasticsearch.common.xcontent.support.XContentMapValues;
 import org.elasticsearch.river.AbstractRiverComponent;
 import org.elasticsearch.river.River;
 import org.elasticsearch.river.RiverIndexName;
@@ -14,6 +13,8 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+
+import static org.elasticsearch.common.xcontent.support.XContentMapValues.*;
 
 /**
  * @author Stephen Samuel
@@ -45,16 +46,11 @@ public class Neo4jDriver extends AbstractRiverComponent implements River {
         this.settings = settings;
         this.client = client;
 
-        uri =
-                XContentMapValues.nodeStringValue(XContentMapValues.extractValue("neo4j.hostname", settings.settings()),
-                        DEFAULT_NEO_URI);
-        timestampField =
-                XContentMapValues.nodeStringValue(XContentMapValues.extractValue("neo4j.timestampField", settings.settings()),
-                        DEFAULT_NEO_TIMESTAMP_FIELD);
-        interval = XContentMapValues.nodeIntegerValue(XContentMapValues.extractValue("neo4j.interval", settings.settings()),
-                DEFAULT_NEO_INTERVAL);
-        index = XContentMapValues.nodeStringValue(XContentMapValues.extractValue("index.name", settings.settings()), DEFAULT_NEO_INDEX);
-        type = XContentMapValues.nodeStringValue(XContentMapValues.extractValue("index.name", settings.settings()), DEFAULT_NEO_TYPE);
+        uri = nodeStringValue(extractValue("neo4j.uri", settings.settings()), DEFAULT_NEO_URI);
+        timestampField = nodeStringValue(extractValue("neo4j.timestampField", settings.settings()), DEFAULT_NEO_TIMESTAMP_FIELD);
+        interval = nodeIntegerValue(extractValue("neo4j.interval", settings.settings()), DEFAULT_NEO_INTERVAL);
+        index = nodeStringValue(extractValue("index.name", settings.settings()), DEFAULT_NEO_INDEX);
+        type = nodeStringValue(extractValue("index.name", settings.settings()), DEFAULT_NEO_TYPE);
 
         logger.debug("Neo4j settings [uri={}]", new Object[]{uri});
         logger.debug("River settings [indexName={}, interval={}, timestampField={}]", new Object[]{index, interval, timestampField});
