@@ -15,15 +15,14 @@ public class Neo4jPollerTest {
     @Test
     public void pollerPollsEveryInterval() throws InterruptedException {
 
-        int interval = 100;
+        int interval = 200;
         Neo4jPoller poller = new Neo4jPoller(indexer, interval);
 
         Thread thread = new Thread(poller);
         thread.start();
 
-        Thread.sleep(interval * 6);
-        Mockito.verify(indexer, Mockito.times(5)).index(); // 6 fence posts 5 panels
-
+        Thread.sleep(interval * 2 + interval / 2);
+        Mockito.verify(indexer, Mockito.times(2)).index(); // 6 fence posts 5 panels
         thread.interrupt();
         thread.join(2000);
     }
