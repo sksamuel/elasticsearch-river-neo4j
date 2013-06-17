@@ -47,18 +47,29 @@ public class Neo4jIndexer implements Runnable {
         logger.debug("Starting indexer");
         while (true) {
             try {
+
                 Node node = queue.take();
+
                 if (node == POISON) {
                     logger.info("Poison pill eaten - exiting indexer");
                     return;
                 }
+
                 try {
+
                     IndexRequest req = strategy.build(index, type, node);
                     client.index(req).actionGet();
                     logger.debug("...indexed");
+
                 } catch (Exception e) {
                     logger.warn("{}", e);
                 }
+
+                if (Thread.interrupted()) {
+                    logger.info("Indexer interrupted, safely shutting down");
+                    shutdown();
+                }
+
             } catch (InterruptedException ignored) {
                 logger.info("Indexer rudely interrupted, safely shutting down");
                 shutdown();
