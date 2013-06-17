@@ -1,15 +1,14 @@
 package org.elasticsearch.plugin.river.neo4j;
 
+import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.Client;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.neo4j.graphdb.Node;
 
 import java.io.IOException;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 /**
  * @author Stephen Samuel
@@ -20,12 +19,13 @@ public class Neo4jIndexerTest {
     IndexingStrategy strategy = mock(IndexingStrategy.class);
 
     @Test
-    public void messageIsIndexedUsingStrategy() throws InterruptedException, IOException {
+    public void queuedNodeIsIndexed() throws InterruptedException, IOException {
 
         Node node = mock(Node.class);
         Neo4jIndexer indexer = new Neo4jIndexer(client, "myindex", "mytype", strategy);
         IndexRequest req = new IndexRequest("myindex", "mytype");
-        Mockito.when(strategy.build("myindex", "mytype", node)).thenReturn(req);
+        when(strategy.build("myindex", "mytype", node)).thenReturn(req);
+        when(client.index(req)).thenReturn(mock(ActionFuture.class));
 
         Thread thread = new Thread(indexer);
         thread.start();

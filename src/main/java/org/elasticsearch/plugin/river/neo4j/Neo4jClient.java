@@ -16,10 +16,14 @@ public class Neo4jClient {
     private final Neo4jIndexer indexer;
 
     public Neo4jClient(String uri, Neo4jIndexer indexer) {
-        if (uri == null) throw new IllegalStateException();
+        this(new SpringRestGraphDatabase(uri), indexer);
+    }
+
+    public Neo4jClient(SpringRestGraphDatabase db, Neo4jIndexer indexer) {
+        if (db == null) throw new IllegalStateException();
         if (indexer == null) throw new IllegalStateException();
+        this.db = db;
         this.indexer = indexer;
-        db = new SpringRestGraphDatabase(uri);
     }
 
     /**

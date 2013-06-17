@@ -25,12 +25,14 @@ public class Neo4jIndexer implements Runnable {
     private final BlockingQueue<Node> queue = new LinkedBlockingQueue<Node>();
 
     public Neo4jIndexer(Client client, String index, String type, IndexingStrategy strategy) {
-        this.type = type;
-        this.strategy = strategy;
         if (client == null) throw new IllegalStateException();
         if (index == null) throw new IllegalStateException();
+        if (type == null) throw new IllegalStateException();
+        if (strategy == null) throw new IllegalStateException();
         this.client = client;
         this.index = index;
+        this.type = type;
+        this.strategy = strategy;
     }
 
     public void index(Node node) {
