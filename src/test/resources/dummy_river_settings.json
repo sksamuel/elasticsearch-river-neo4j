@@ -1,0 +1,12 @@
+{
+    "type": "neo4j",
+    "neo4j": {
+        "hostname": "1.2.3.4",
+        "port": 7654,
+        "timestampField": "time",
+        "interval": 500
+    },
+    "index": {
+        "name": "neoindex"
+    }
+}

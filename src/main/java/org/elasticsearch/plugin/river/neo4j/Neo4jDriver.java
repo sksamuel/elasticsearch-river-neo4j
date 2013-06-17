@@ -11,22 +11,24 @@ import org.elasticsearch.river.RiverSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Map;
-
 /**
  * @author Stephen Samuel
  */
 public class Neo4jDriver extends AbstractRiverComponent implements River {
 
     static final int DEFAULT_NEO_PORT = 7474;
+    static final int DEFAULT_NEO_INTERVAL = 60000;
     static final String DEFAULT_NEO_INDEX = "neo4j-index";
     static final String DEFAULT_NEO_HOSTNAME = "localhost";
+    static final String DEFAULT_NEO_TIMESTAMP_FIELD = "timestmap";
 
     private static Logger logger = LoggerFactory.getLogger(Neo4jDriver.class);
 
     private final String hostname;
     private final String index;
     private final int port;
+    private final String timestampField;
+    private final int interval;
 
     private final RiverSettings settings;
     private final Client client;
@@ -37,34 +39,47 @@ public class Neo4jDriver extends AbstractRiverComponent implements River {
         this.settings = settings;
         this.client = client;
 
-        if (settings.settings().containsKey("redis")) {
-            Map<String, Object> redisSettings = (Map<String, Object>) settings.settings().get("redis");
-            hostname = XContentMapValues.nodeStringValue(redisSettings.get("hostname"), DEFAULT_NEO_HOSTNAME);
-            port = XContentMapValues.nodeIntegerValue(redisSettings.get("port"), DEFAULT_NEO_PORT);
-        } else {
-            hostname = DEFAULT_NEO_HOSTNAME;
-            port = DEFAULT_NEO_PORT;
-        }
-
-        if (settings.settings().containsKey("index")) {
-            Map<String, Object> redisSettings = (Map<String, Object>) settings.settings().get("index");
-            index = XContentMapValues.nodeStringValue(redisSettings.get("name"), DEFAULT_NEO_INDEX);
-        } else {
-            index = DEFAULT_NEO_INDEX;
-        }
+        hostname =
+                XContentMapValues.nodeStringValue(XContentMapValues.extractValue("neo4j.hostname", settings.settings()),
+                        DEFAULT_NEO_HOSTNAME);
+        port = XContentMapValues.nodeIntegerValue(XContentMapValues.extractValue("neo4j.port", settings.settings()), DEFAULT_NEO_PORT);
+        timestampField =
+                XContentMapValues.nodeStringValue(XContentMapValues.extractValue("neo4j.timestampField", settings.settings()),
+                        DEFAULT_NEO_TIMESTAMP_FIELD);
+        interval = XContentMapValues.nodeIntegerValue(XContentMapValues.extractValue("neo4j.interval", settings.settings()),
+                DEFAULT_NEO_INTERVAL);
+        index = XContentMapValues.nodeStringValue(XContentMapValues.extractValue("index.name", settings.settings()), DEFAULT_NEO_INDEX);
 
         logger.debug("Neo4j settings [hostname={}, port={}]", new Object[]{hostname, port});
-        logger.debug("River settings [indexName={}]", new Object[]{index});
+        logger.debug("River settings [indexName={}, interval={}, timestampField={}]", new Object[]{index, interval, timestampField});
     }
 
     @Override
     public void start() {
         logger.info("Starting neo4j river driver");
-
     }
 
     @Override
     public void close() {
     }
 
+    public String getHostname() {
+        return hostname;
+    }
+
+    public String getIndex() {
+        return index;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public String getTimestampField() {
+        return timestampField;
+    }
+
+    public int getInterval() {
+        return interval;
+    }
 }
