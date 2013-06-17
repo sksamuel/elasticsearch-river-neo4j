@@ -6,3 +6,6 @@
 *.jar
 *.war
 *.ear
+
+target
+target/
