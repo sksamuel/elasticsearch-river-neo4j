@@ -17,7 +17,7 @@
         <!-- Include Jedis driver as dependency -->
         <dependencySet>
             <includes>
-                <include>redis.clients:jedis</include>
+                <include>org.springframework.data:spring-data-neo4j-rest</include>
             </includes>
         </dependencySet>
     </dependencySets>

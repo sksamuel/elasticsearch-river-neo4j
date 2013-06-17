@@ -59,6 +59,7 @@ public class Neo4jIndexer implements Runnable {
 
                 try {
 
+                    logger.debug("Indexing [index={}, type={}, properties={}", new Object[]{index, type, node.getPropertyValues()});
                     IndexRequest req = strategy.build(index, type, node);
                     client.index(req).actionGet();
                     logger.debug("...indexed");

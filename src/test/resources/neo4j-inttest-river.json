@@ -1,0 +1,11 @@
+{
+    "type": "neo4j",
+    "neo4j": {
+        "uri": "http://localhost:7474/db/data",
+        "interval": 450
+    },
+    "index": {
+        "name": "neo4j-index",
+        "type": "node"
+    }
+}
