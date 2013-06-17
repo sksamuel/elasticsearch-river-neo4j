@@ -36,7 +36,7 @@ public class Neo4jDriver extends AbstractRiverComponent implements River {
     private final RiverSettings settings;
     private final Client client;
     private final String type;
-    private ExecutorService executor;
+    ExecutorService executor;
     private Neo4jIndexer indexer;
     private Neo4jPoller poller;
 
@@ -50,7 +50,7 @@ public class Neo4jDriver extends AbstractRiverComponent implements River {
         timestampField = nodeStringValue(extractValue("neo4j.timestampField", settings.settings()), DEFAULT_NEO_TIMESTAMP_FIELD);
         interval = nodeIntegerValue(extractValue("neo4j.interval", settings.settings()), DEFAULT_NEO_INTERVAL);
         index = nodeStringValue(extractValue("index.name", settings.settings()), DEFAULT_NEO_INDEX);
-        type = nodeStringValue(extractValue("index.name", settings.settings()), DEFAULT_NEO_TYPE);
+        type = nodeStringValue(extractValue("index.type", settings.settings()), DEFAULT_NEO_TYPE);
 
         logger.debug("Neo4j settings [uri={}]", new Object[]{uri});
         logger.debug("River settings [indexName={}, interval={}, timestampField={}]", new Object[]{index, interval, timestampField});
@@ -79,7 +79,7 @@ public class Neo4jDriver extends AbstractRiverComponent implements River {
             return;
 
         logger.debug("Shutting down executor");
-        executor.shutdown();
+        executor.shutdownNow();
         logger.debug("Will wait 30 seconds for previous tasks to finish...");
         try {
             executor.awaitTermination(30, TimeUnit.SECONDS);

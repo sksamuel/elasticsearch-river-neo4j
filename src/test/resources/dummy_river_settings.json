@@ -6,6 +6,7 @@
         "interval": 500
     },
     "index": {
-        "name": "neoindex"
+        "name": "neoindex",
+        "type": "turtle"
     }
 }
