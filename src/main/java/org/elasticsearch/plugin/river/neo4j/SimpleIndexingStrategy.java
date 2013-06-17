@@ -16,11 +16,12 @@ public class SimpleIndexingStrategy implements IndexingStrategy {
     public IndexRequest build(String index, String type, Node node) throws IOException {
 
         XContentBuilder src = XContentFactory.jsonBuilder().startObject();
-        IndexRequest req = new IndexRequest(index, type, String.valueOf(node.getId()));
         for (String key : node.getPropertyKeys()) {
             String value = node.getProperty(key).toString();
             src.field(key, value);
         }
-        return req;
+        src.endObject();
+
+        return new IndexRequest(index, type, String.valueOf(node.getId())).source(src);
     }
 }
