@@ -35,6 +35,9 @@ public class Neo4jPoller implements Runnable {
                 client.poll();
                 logger.debug("...polling completed");
 
+                if (Thread.interrupted())
+                    shutdown();
+
             } catch (InterruptedException ignored) {
                 logger.debug("Poller rudely interrupted, safely shutting down");
                 shutdown();
