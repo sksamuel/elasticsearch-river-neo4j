@@ -91,81 +91,68 @@ public class Neo4jRiverIntTest {
     }
 
     @Test
-    public void connectRiverAndAddNodes() throws InterruptedException {
+    public void testAddAndRemoveNodes() throws InterruptedException {
 
         Thread.sleep(200); // allow river to start
-
-        String chris = UUID.randomUUID().toString();
-        String ian = UUID.randomUUID().toString();
+        String name = UUID.randomUUID().toString();
 
         // add node to neo4j
         Map map = new HashMap();
-        map.put("name", chris);
-        map.put("band", "coldplay");
+        map.put("name", name);
         Transaction tx = db.beginTx();
         org.neo4j.graphdb.Node n = db.createNode(map);
         tx.success();
 
-        Thread.sleep(2000); // time for poller to index
-        refreshIndex();
+        CountResponse resp = null;
 
-        logger.debug("Counting on [index={}, type={}]", new Object[]{index, type});
-        CountResponse resp = node.client().count(countRequest(index).types(type).query(fieldQuery("name", chris))).actionGet();
+        int k = 0;
+        while (k++ < 100) {
+
+            Thread.sleep(200); // time for poller to index
+            refreshIndex();
+
+            logger.debug("Count request [index={}, type={}, name={}]", new Object[]{index, type, name});
+            resp = node.client().count(countRequest(index).types(type).query(fieldQuery("name", name))).actionGet();
+            if (1 == resp.getCount())
+                break;
+
+        }
         assertEquals(1, resp.getCount());
 
         db.remove(n);
 
-        resp = node.client().count(countRequest(index).types(type).query(fieldQuery("name", ian))).actionGet();
+        k = 0;
+        while (k++ < 100) {
+
+            Thread.sleep(200); // time for poller to index
+            refreshIndex();
+
+            logger.debug("Count request [index={}, type={}, name={}]", new Object[]{index, type, name});
+            resp = node.client().count(countRequest(index).types(type).query(fieldQuery("name", name))).actionGet();
+            if (0 == resp.getCount())
+                break;
+
+        }
+
         assertEquals(0, resp.getCount());
-
-        map = new HashMap();
-        map.put("name", ian);
-        map.put("band", "jethro tull");
-        tx = db.beginTx();
-        n = db.createNode(map);
-        tx.success();
-
-        Thread.sleep(2000); // time for poller and indexer
-        refreshIndex();
-
-        resp = node.client().count(countRequest(index).types(type).query(fieldQuery("name", ian))).actionGet();
-        assertEquals(1, resp.getCount());
-
-        db.remove(n);
 
         shutdown();
     }
 
-    @Test
-    public void deletedNodeShouldNotBeFound() throws InterruptedException {
-
+    /**
+     * I use this test for a shell like experience, has to be cancelled manually.
+     */
+    // @Test
+    public void infiniteTest() throws InterruptedException {
         Thread.sleep(200); // allow river to start
-
-        String chris = UUID.randomUUID().toString();
-
-        // add node to neo4j
-        Map map = new HashMap();
-        map.put("name", chris);
-        Transaction tx = db.beginTx();
-        org.neo4j.graphdb.Node n = db.createNode(map);
-        tx.success();
-
-        Thread.sleep(2000); // time for poller to index
-        refreshIndex();
-
-        logger.debug("Counting on [index={}, type={}]", new Object[]{index, type});
-        CountResponse resp = node.client().count(countRequest(index).types(type).query(fieldQuery("name", chris))).actionGet();
-        assertEquals(1, resp.getCount());
-
-        db.remove(n);
-
-        Thread.sleep(2000); // time for poller to reindex
-        refreshIndex();
-
-        resp = node.client().count(countRequest(index).types(type).query(fieldQuery("name", chris))).actionGet();
-        assertEquals(0, resp.getCount());
-
-        shutdown();
+        while (true) {
+            Thread.sleep(200); // time for poller to index
+            refreshIndex();
+            CountResponse
+                    resp =
+                    node.client().count(countRequest(index).types(type).query(fieldQuery("manager", "mowbray"))).actionGet();
+            logger.debug("How many moggas? {} !", resp.getCount());
+        }
     }
 
     private void refreshIndex() {

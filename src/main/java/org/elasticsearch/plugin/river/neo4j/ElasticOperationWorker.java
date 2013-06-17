@@ -48,7 +48,7 @@ public class ElasticOperationWorker implements Runnable {
                     break;
                 }
 
-                logger.debug("Executing elastic operation {}", op);
+                logger.debug("Exec elastic op={}", op);
                 op.run(client);
 
                 if (Thread.currentThread().isInterrupted()) {
@@ -99,14 +99,22 @@ class IndexOperation implements ElasticOperation {
 
     @Override
     public void run(Client client) {
-        logger.debug("Indexing [properties={}", new Object[]{node.getPropertyValues()});
         try {
             IndexRequest req = strategy.build(index, type, node, version);
             client.index(req).actionGet();
-            logger.debug("...indexed");
         } catch (IOException e) {
-            logger.error("... error indexing [{}]", e);
+            logger.error("Error indexing [{}]", e);
         }
+    }
+
+    @Override
+    public String toString() {
+        return "IndexOperation{" +
+                "index='" + index + '\'' +
+                ", type='" + type + '\'' +
+                ", node=" + node +
+                ", version=" + version +
+                '}';
     }
 }
 
@@ -128,12 +136,20 @@ class ExpungeOperation implements ElasticOperation {
 
     @Override
     public void run(Client client) {
-        logger.debug("Expunging expired [currentVersion={}]", version);
         try {
             DeleteByQueryRequest req = strategy.build(index, type, version);
             client.deleteByQuery(req).actionGet();
         } catch (RuntimeException e) {
-            logger.error("... error expunging [{}]", e);
+            logger.error("Error expunging [{}]", e);
         }
+    }
+
+    @Override
+    public String toString() {
+        return "ExpungeOperation{" +
+                "type='" + type + '\'' +
+                ", index='" + index + '\'' +
+                ", version=" + version +
+                '}';
     }
 }
