@@ -81,6 +81,7 @@
                                     <goal>test</goal>
                                 </goals>
                                 <configuration>
+                                    <skip>false</skip>
                                     <includes>
                                         <include>**/*IntTest.java</include>
                                     </includes>
@@ -280,6 +281,9 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
+                    <configuration>
+                        <skip>true</skip>
+                    </configuration>
                     <executions>
                         <execution>
                             <id>unit-tests</id>
@@ -288,6 +292,7 @@
                                 <goal>test</goal>
                             </goals>
                             <configuration>
+                                <skip>false</skip>
                                 <excludes>
                                     <exclude>**/*IntTest.java</exclude>
                                 </excludes>
