@@ -9,6 +9,7 @@ import org.elasticsearch.river.RiverName;
 import org.elasticsearch.river.RiverSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.neo4j.rest.SpringRestGraphDatabase;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -33,17 +34,16 @@ public class Neo4jDriver extends AbstractRiverComponent implements River {
     private final String index;
     private final String timestampField;
     private final int interval;
-    private final RiverSettings settings;
     private final Client client;
     private final String type;
     ExecutorService executor;
-    private Neo4jIndexer indexer;
-    private Neo4jPoller poller;
+
+    private SimpleIndexingStrategy indexingStrategy = new SimpleIndexingStrategy();
+    private SimpleDeletingStrategy deletingStategy = new SimpleDeletingStrategy();
 
     @Inject
     public Neo4jDriver(RiverName riverName, RiverSettings settings, @RiverIndexName final String riverIndexName, final Client client) {
         super(riverName, settings);
-        this.settings = settings;
         this.client = client;
 
         uri = nodeStringValue(extractValue("neo4j.uri", settings.settings()), DEFAULT_NEO_URI);
@@ -61,13 +61,13 @@ public class Neo4jDriver extends AbstractRiverComponent implements River {
     public void start() {
         logger.info("Starting neo4j river");
 
-        SimpleIndexingStrategy strategy = new SimpleIndexingStrategy();
-        indexer = new Neo4jIndexer(client, index, type, strategy);
-        Neo4jClient neo4j = new Neo4jClient(uri, indexer);
-        poller = new Neo4jPoller(neo4j, interval);
+        ElasticOperationWorker worker = new ElasticOperationWorker(client);
+        SpringRestGraphDatabase db = new SpringRestGraphDatabase(uri);
+        Neo4jIndexer indexer = new Neo4jIndexer(db, worker, indexingStrategy, deletingStategy, index, type);
+        Neo4jPoller poller = new Neo4jPoller(indexer, interval);
 
         executor = Executors.newFixedThreadPool(2);
-        executor.submit(indexer);
+        executor.submit(worker);
         executor.submit(poller);
 
         logger.debug("Neo4j river started");

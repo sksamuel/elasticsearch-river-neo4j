@@ -17,6 +17,8 @@ import static org.mockito.Mockito.when;
  */
 public class SimpleIndexingStrategyTest {
 
+    SimpleIndexingStrategy s = new SimpleIndexingStrategy();
+
     @Test
     public void thatNodePropertiesAreUsedAsFieldValues() throws IOException {
 
@@ -27,11 +29,11 @@ public class SimpleIndexingStrategyTest {
         when(node.getProperty("name")).thenReturn("chris martin");
         when(node.getProperty("location")).thenReturn("hampstead");
         when(node.getProperty("band")).thenReturn("coldplay");
-        SimpleIndexingStrategy s = new SimpleIndexingStrategy();
 
-        IndexRequest req = s.build("neo4j-index", "node", node);
+        IndexRequest req = s.build("neo4j-index", "node", node, 12);
         assertEquals("neo4j-index", req.index());
         assertEquals("node", req.type());
+        assertEquals(12, req.sourceAsMap().get("version"));
         assertEquals(String.valueOf(id), req.id());
         assertEquals("coldplay", req.sourceAsMap().get("band"));
         assertEquals("hampstead", req.sourceAsMap().get("location"));

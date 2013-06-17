@@ -10,13 +10,12 @@ public class Neo4jPoller implements Runnable {
 
     private static final Logger logger = LoggerFactory.getLogger(Neo4jPoller.class);
 
-    private final Neo4jClient client;
     private final int interval;
+    private final Neo4jIndexer indexer;
     private volatile boolean running = true;
 
-    public Neo4jPoller(Neo4jClient client, int interval) {
-        if (client == null) throw new IllegalStateException();
-        this.client = client;
+    public Neo4jPoller(Neo4jIndexer indexer, int interval) {
+        this.indexer = indexer;
         this.interval = interval;
     }
 
@@ -31,9 +30,8 @@ public class Neo4jPoller implements Runnable {
 
                 logger.debug("Sleeping for {}ms", interval);
                 Thread.sleep(interval);
-                logger.debug("Awake and about to poll...");
-                client.poll();
-                logger.debug("...polling completed");
+
+                indexer.index();
 
                 if (Thread.interrupted())
                     shutdown();
@@ -44,4 +42,5 @@ public class Neo4jPoller implements Runnable {
             }
         }
     }
+
 }

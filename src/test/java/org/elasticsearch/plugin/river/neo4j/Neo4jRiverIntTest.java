@@ -106,7 +106,7 @@ public class Neo4jRiverIntTest {
         org.neo4j.graphdb.Node n = db.createNode(map);
         tx.success();
 
-        Thread.sleep(1000); // time for poller to index
+        Thread.sleep(2000); // time for poller to index
         refreshIndex();
 
         logger.debug("Counting on [index={}, type={}]", new Object[]{index, type});
@@ -125,13 +125,45 @@ public class Neo4jRiverIntTest {
         n = db.createNode(map);
         tx.success();
 
-        Thread.sleep(1000); // time for poller and indexer
+        Thread.sleep(2000); // time for poller and indexer
         refreshIndex();
 
         resp = node.client().count(countRequest(index).types(type).query(fieldQuery("name", ian))).actionGet();
         assertEquals(1, resp.getCount());
 
         db.remove(n);
+
+        shutdown();
+    }
+
+    @Test
+    public void deletedNodeShouldNotBeFound() throws InterruptedException {
+
+        Thread.sleep(200); // allow river to start
+
+        String chris = UUID.randomUUID().toString();
+
+        // add node to neo4j
+        Map map = new HashMap();
+        map.put("name", chris);
+        Transaction tx = db.beginTx();
+        org.neo4j.graphdb.Node n = db.createNode(map);
+        tx.success();
+
+        Thread.sleep(2000); // time for poller to index
+        refreshIndex();
+
+        logger.debug("Counting on [index={}, type={}]", new Object[]{index, type});
+        CountResponse resp = node.client().count(countRequest(index).types(type).query(fieldQuery("name", chris))).actionGet();
+        assertEquals(1, resp.getCount());
+
+        db.remove(n);
+
+        Thread.sleep(2000); // time for poller to reindex
+        refreshIndex();
+
+        resp = node.client().count(countRequest(index).types(type).query(fieldQuery("name", chris))).actionGet();
+        assertEquals(0, resp.getCount());
 
         shutdown();
     }

@@ -11,5 +11,5 @@ import java.io.IOException;
  * @author Stephen Samuel
  */
 public interface IndexingStrategy {
-    IndexRequest build(String index, String type, Node node) throws IOException;
+    IndexRequest build(String index, String type, Node node, long version) throws IOException;
 }

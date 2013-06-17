@@ -1,15 +1,20 @@
 package org.elasticsearch.plugin.river.neo4j;
 
-import org.elasticsearch.action.ActionFuture;
-import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.client.Client;
+import org.junit.Before;
 import org.junit.Test;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Matchers;
+import org.mockito.Mockito;
 import org.neo4j.graphdb.Node;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.neo4j.rest.SpringRestGraphDatabase;
 
-import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
 /**
@@ -17,73 +22,41 @@ import static org.mockito.Mockito.*;
  */
 public class Neo4jIndexerTest {
 
-    Client client = mock(Client.class);
-    IndexingStrategy strategy = mock(IndexingStrategy.class);
+    private static final Logger logger = LoggerFactory.getLogger(Neo4jIndexerTest.class);
 
-    @Test
-    public void queuedNodeIsIndexed() throws InterruptedException, IOException {
+    ElasticOperationWorker worker;
+    SpringRestGraphDatabase db;
+    Neo4jIndexer indexer;
 
-        Node node = mock(Node.class);
-        Neo4jIndexer indexer = new Neo4jIndexer(client, "myindex", "mytype", strategy);
-        IndexRequest req = new IndexRequest("myindex", "mytype");
-        when(strategy.build("myindex", "mytype", node)).thenReturn(req);
-        when(client.index(req)).thenReturn(mock(ActionFuture.class));
-
-        Thread thread = new Thread(indexer);
-        thread.start();
-
-        indexer.index(node);
-        indexer.shutdown();
-        thread.join();
-
-        verify(client).index(req);
+    @Before
+    public void before() {
+        worker = mock(ElasticOperationWorker.class);
+        db = mock(SpringRestGraphDatabase.class);
+        indexer = new Neo4jIndexer(db, worker, new SimpleIndexingStrategy(), new SimpleDeletingStrategy(), "myindex", "mytype");
     }
 
     @Test
-    public void interruptionOnBlockedKillsThread() throws InterruptedException {
-
-        Neo4jIndexer indexer = new Neo4jIndexer(client, "myindex", "mytype", strategy);
-
-        Thread thread = new Thread(indexer);
-        thread.start();
-        Thread.sleep(200);         // should be blocked now on empty queue
-        thread.interrupt(); // will interrupt block on queue shutting us down
-        thread.join(2000);
+    public void thatAllNodesAreQueuedAndExpunged() {
+        Node node1 = mock(Node.class);
+        Node node2 = mock(Node.class);
+        Node node3 = mock(Node.class);
+        Mockito.when(db.getAllNodes()).thenReturn(Arrays.asList(node1, node2, node3));
+        indexer.index();
+        verify(worker, times(4)).queue(Matchers.any(IndexOperation.class)); // 3itimes for index and once for expunge
     }
 
     @Test
-    public void interruptionOnNonBlockedKillsThread() throws InterruptedException, IOException {
-
-        Neo4jIndexer indexer = new Neo4jIndexer(client, "myindex", "mytype", strategy);
-
-        Thread thread = new Thread(indexer);
-        thread.start();
-        for (int k = 0; k < 5; k++) {
-            Node node = mock(Node.class);
-            when(strategy.build("myindex", "mytype", node)).thenAnswer(new Answer<IndexRequest>() {
-
-                @Override
-                public IndexRequest answer(InvocationOnMock invocation) throws Throwable {
-                    Thread.sleep(100);
-                    return null;
-                }
-            });
-            indexer.index(mock(Node.class));
-        }
-        thread.interrupt(); // will interrupt a non blocked process and add posion
-        thread.join(2000);
+    public void thatExpungeIsCalledOnEmptyRequests() {
+        Mockito.when(db.getAllNodes()).thenReturn(Collections.<Node>emptyList());
+        indexer.index();
+        ArgumentCaptor<ExpungeOperation> captor = ArgumentCaptor.forClass(ExpungeOperation.class);
+        verify(worker).queue(captor.capture());
+        assertEquals(captor.getValue().getClass(), ExpungeOperation.class);
     }
 
     @Test
-    public void shutdownKillsThread() throws InterruptedException {
-
-        Neo4jIndexer indexer = new Neo4jIndexer(client, "myindex", "mytype", strategy);
-
-        Thread thread = new Thread(indexer);
-        thread.start();
-
-        Thread.sleep(200);         // should be blocked now on empty queue
-        indexer.shutdown(); // should add poison pill to shut down
-        thread.join(2000);
+    public void thatVersionReturnsLogicalIncreaseNeverLessThanCurrentTime() {
+        indexer.version = 10;
+        assertTrue(indexer.getVersion() >= System.currentTimeMillis());
     }
 }

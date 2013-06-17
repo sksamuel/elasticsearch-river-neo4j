@@ -10,19 +10,19 @@ import static org.mockito.Mockito.mock;
  */
 public class Neo4jPollerTest {
 
-    Neo4jClient client = mock(Neo4jClient.class);
+    Neo4jIndexer indexer = mock(Neo4jIndexer.class);
 
     @Test
     public void pollerPollsEveryInterval() throws InterruptedException {
 
         int interval = 100;
-        Neo4jPoller poller = new Neo4jPoller(client, interval);
+        Neo4jPoller poller = new Neo4jPoller(indexer, interval);
 
         Thread thread = new Thread(poller);
         thread.start();
 
         Thread.sleep(interval * 6);
-        Mockito.verify(client, Mockito.times(5)).poll(); // 6 fence posts 5 panels
+        Mockito.verify(indexer, Mockito.times(5)).index(); // 6 fence posts 5 panels
 
         thread.interrupt();
         thread.join(2000);
@@ -31,7 +31,7 @@ public class Neo4jPollerTest {
     @Test
     public void interruptionKillsThread() throws InterruptedException {
 
-        Neo4jPoller poller = new Neo4jPoller(client, 500);
+        Neo4jPoller poller = new Neo4jPoller(indexer, 500);
 
         Thread thread = new Thread(poller);
         thread.start();
@@ -43,7 +43,7 @@ public class Neo4jPollerTest {
     @Test
     public void shutdownKillsThread() throws InterruptedException {
 
-        Neo4jPoller poller = new Neo4jPoller(client, 500);
+        Neo4jPoller poller = new Neo4jPoller(indexer, 500);
 
         Thread thread = new Thread(poller);
         thread.start();

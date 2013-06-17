@@ -13,9 +13,10 @@ import java.io.IOException;
 public class SimpleIndexingStrategy implements IndexingStrategy {
 
     @Override
-    public IndexRequest build(String index, String type, Node node) throws IOException {
+    public IndexRequest build(String index, String type, Node node, long version) throws IOException {
 
         XContentBuilder src = XContentFactory.jsonBuilder().startObject();
+        src.field("version", version);
         for (String key : node.getPropertyKeys()) {
             String value = node.getProperty(key).toString();
             src.field(key, value);
