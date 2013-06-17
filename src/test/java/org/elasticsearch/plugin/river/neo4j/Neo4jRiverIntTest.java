@@ -108,7 +108,7 @@ public class Neo4jRiverIntTest {
         int k = 0;
         while (k++ < 100) {
 
-            Thread.sleep(200); // time for poller to index
+            Thread.sleep(1000); // time for poller to index
             refreshIndex();
 
             logger.debug("Count request [index={}, type={}, name={}]", new Object[]{index, type, name});
@@ -124,7 +124,7 @@ public class Neo4jRiverIntTest {
         k = 0;
         while (k++ < 100) {
 
-            Thread.sleep(200); // time for poller to index
+            Thread.sleep(1000); // time for poller to index
             refreshIndex();
 
             logger.debug("Count request [index={}, type={}, name={}]", new Object[]{index, type, name});

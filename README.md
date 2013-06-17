@@ -1,11 +1,30 @@
 Neo4j River Plugin for ElasticSearch
 =========================
 
+Neo4j River Plugin is a river module for Elasticsearch that will continuously poll a neo4j server and index the nodes for searching inside elastic search. The period betweens polls can be configured. All nodes will be updated on each poll, and any deleted nodes since the last poll will be removed from the index. Versioning is used to identify which nodes have been removed since the last poll.
+
+The nodes will be indexed using the properties set on them, with the neo4j node id being the id used inside elastic. So if you have a node of _id=7_ with the properties _name=sam_ and _location=london_ then the elastic search index request would look like
+
+```json
+{
+ "_id" : 7,
+ "name" : "sam",
+ "location" : "london",
+ "version" : 1234567
+}
+```
+
+
+
+## Plugin history
+
 | Neo4j Driver Plugin | ElasticSearch | Neo4j |
 | ------ | --------- | --------- |
-| 0.90.1.x | 0.90.1 | 1.9.x |
+| 0.90.1.x | 0.90.1 | 1.8.x |
 
 [![Build Status](https://travis-ci.org/sksamuel/elasticsearch-river-neo4j.png)](https://travis-ci.org/sksamuel/elasticsearch-river-neo4j)
+
+
 
 ## How to use
 
@@ -15,11 +34,12 @@ Start the neo4j river by curling a document like the following to the river inde
 curl -XPUT 'http://localhost:9200/_river/my_neo_river/_meta' -d '{
     "type": "neo4j",
     "neo4j": {
-        "hostname": "NEO4J_HOSTNAME",
-        "port" : "NEO4J_PORT_OPTIONAL",
+        "uri": "<NEO4J_URI>",
+        "interval": <some interval>
     },
     "index": {
-        "name": "INDEX_NAME",
+        "name": "<INDEX_NAME>",
+        "type: "<TYPE>"
     }
 }'
 ```
@@ -28,8 +48,38 @@ The following parameters are available in the neo4j river document.
 
 | Parameter | Description |
 | ------ | --------- |
+| neo4j.uri | The full URI to the neo4j server, eg http://localhost:7474/db/data |
+| neo4j.interval | The time between polling the neo4j instance. The greater this value, the lower the load on the server but the longer between updates in neo4j being reflected inside elastic |
+| index.name | The name of the index to index nodes into |
+| index.type | The type to use for indexing |
 
-## Example
+
+
+## Integration Tests
+
+Make sure you are running a neo4j server on localhost:7474 or alternatively update the neo4j-inttest-river.json settings inside src/test/resources
+to point to your local server.
+
+Then execute:
+```mvn -Pint-test clean install```
+
+
+## How to use
+
+The plugin is available on maven central.
+
+```xml
+<dependency>
+    <groupId>com.sksamuel.elasticsearch</groupId>
+    <artifactId>elasticsearch-river-neo4j</artifactId>
+    <version>0.90.1.1</version>
+</dependency>
+```
+
+To install run:
+```
+$ bin\plugin -install com.sksamuel.elasticsearch/elasticsearch-river-neo4j/0.90.1.1
+```
 
 
 
