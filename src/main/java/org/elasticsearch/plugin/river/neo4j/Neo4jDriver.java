@@ -53,7 +53,10 @@ public class Neo4jDriver extends AbstractRiverComponent implements River {
         type = nodeStringValue(extractValue("index.type", settings.settings()), DEFAULT_NEO_TYPE);
 
         logger.debug("Neo4j settings [uri={}]", new Object[]{uri});
-        logger.debug("River settings [indexName={}, interval={}, timestampField={}]", new Object[]{index, interval, timestampField});
+        logger.debug("River settings [indexName={}, type={}, interval={}, timestampField={}]", new Object[]{index,
+                type,
+                interval,
+                timestampField});
 
     }
 
