@@ -64,7 +64,7 @@ Then execute:
 ```mvn -Pint-test clean install```
 
 
-## How to use
+## How to install
 
 The plugin is available on maven central.
 
