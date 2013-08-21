@@ -10,11 +10,11 @@ public class Neo4jPoller implements Runnable {
 
     private static final Logger logger = LoggerFactory.getLogger(Neo4jPoller.class);
 
-    private final int interval;
+    private final long interval;
     private final Neo4jIndexer indexer;
     private volatile boolean running = true;
 
-    public Neo4jPoller(Neo4jIndexer indexer, int interval) {
+    public Neo4jPoller(Neo4jIndexer indexer, long interval) {
         this.indexer = indexer;
         this.interval = interval;
     }
@@ -28,8 +28,8 @@ public class Neo4jPoller implements Runnable {
         while (running) {
             try {
 
-                logger.debug("Sleeping for {}ms", interval);
-                Thread.sleep(interval);
+                logger.debug("Sleeping for {}s", interval);
+                Thread.sleep(interval*1000);
 
                 indexer.index();
 
