@@ -38,7 +38,7 @@ public class Neo4jPoller implements Runnable {
 
                 logger.debug("Sleeping for {} {}", interval, intervalUnit);
                 long msInterval = TimeUnit.MILLISECONDS.convert(interval, intervalUnit);
-                Thread.sleep(intervalUnit);
+                Thread.sleep(msInterval);
 
                 indexer.index();
 
