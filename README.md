@@ -35,7 +35,7 @@ curl -XPUT 'http://localhost:9200/_river/my_neo_river/_meta' -d '{
     "type": "neo4j",
     "neo4j": {
         "uri": "<NEO4J_URI>",
-        "interval": <some interval>
+        "interval": <some interval in ms (only the number)>
     },
     "index": {
         "name": "<INDEX_NAME>",
@@ -49,7 +49,7 @@ The following parameters are available in the neo4j river document.
 | Parameter | Description |
 | ------ | --------- |
 | neo4j.uri | The full URI to the neo4j server, eg http://localhost:7474/db/data |
-| neo4j.interval | The time between polling the neo4j instance. The greater this value, the lower the load on the server but the longer between updates in neo4j being reflected inside elastic |
+| neo4j.interval | The time (in ms) between polling the neo4j instance. The greater this value, the lower the load on the server but the longer between updates in neo4j being reflected inside elastic |
 | index.name | The name of the index to index nodes into |
 | index.type | The type to use for indexing |
 
