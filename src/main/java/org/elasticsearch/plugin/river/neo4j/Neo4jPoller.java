@@ -18,7 +18,7 @@ public class Neo4jPoller implements Runnable {
     private volatile boolean running = true;
     
     public Neo4jPoller(Neo4jIndexer indexer, long interval) {
-        this(indexed, interval, TimeUnit.MILLISECONDS)
+        this(indexer, interval, TimeUnit.MILLISECONDS);
     }
 
     public Neo4jPoller(Neo4jIndexer indexer, long interval, TimeUnit intervalUnit) {
