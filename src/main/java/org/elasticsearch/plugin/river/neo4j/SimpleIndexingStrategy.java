@@ -3,6 +3,7 @@ package org.elasticsearch.plugin.river.neo4j;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
+import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 
 import java.io.IOException;
@@ -21,7 +22,10 @@ public class SimpleIndexingStrategy implements IndexingStrategy {
             String value = node.getProperty(key).toString();
             src.field(key, value);
         }
-        src.endObject();
+        for (Label key : node.getLabels()) {
+            String value = key.name();
+            src.field("label", value);
+        }
 
         return new IndexRequest(index, type, String.valueOf(node.getId())).source(src);
     }
