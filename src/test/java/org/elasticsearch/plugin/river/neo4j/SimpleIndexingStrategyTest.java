@@ -49,6 +49,7 @@ public class SimpleIndexingStrategyTest {
                     }
                     @Override
                     public Label next() {
+                        n++;
                         return new Label() {
                             @Override
                             public String name() {
