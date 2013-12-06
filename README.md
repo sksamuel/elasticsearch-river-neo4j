@@ -39,7 +39,7 @@ curl -XPUT 'http://localhost:9200/_river/my_neo_river/_meta' -d '{
     },
     "index": {
         "name": "<INDEX_NAME>",
-        "type: "<TYPE>"
+        "type": "<TYPE>"
     }
 }'
 ```
