@@ -2,6 +2,10 @@
     "type": "neo4j",
     "neo4j": {
         "uri": "http://192.56.57.89:7888/db/data",
+        "labels": [
+            "User",
+            "Swedish"
+        ],
         "timestampField": "time",
         "interval": 500
     },
