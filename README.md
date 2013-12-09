@@ -43,6 +43,25 @@ curl -XPUT 'http://localhost:9200/_river/my_neo_river/_meta' -d '{
     }
 }'
 ```
+Label(s) index example.
+
+```
+curl -XPUT 'http://localhost:9200/_river/my_neo_river/_meta' -d '{
+    "type": "neo4j",
+    "neo4j": {
+        "uri": "<NEO4J_URI>",
+        "labels": [
+            "User",
+            "Swedish"
+        ],
+        "interval": <some interval in ms (only the number)>
+    },
+    "index": {
+        "name": "<INDEX_NAME>",
+        "type": "<TYPE>"
+    }
+}'
+```
 
 The following parameters are available in the neo4j river document.
 
