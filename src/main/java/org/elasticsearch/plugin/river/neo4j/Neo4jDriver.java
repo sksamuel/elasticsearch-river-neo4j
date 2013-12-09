@@ -1,5 +1,7 @@
 package org.elasticsearch.plugin.river.neo4j;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.inject.Inject;
 import org.elasticsearch.river.AbstractRiverComponent;
@@ -14,11 +16,13 @@ import org.springframework.data.neo4j.rest.SpringRestGraphDatabase;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-
-import static org.elasticsearch.common.xcontent.support.XContentMapValues.*;
+import org.elasticsearch.common.xcontent.support.XContentMapValues;
+import org.neo4j.graphdb.DynamicLabel;
+import org.neo4j.graphdb.Label;
 
 /**
  * @author Stephen Samuel
+ * @author Andre Crouch
  */
 public class Neo4jDriver extends AbstractRiverComponent implements River {
 
@@ -31,6 +35,7 @@ public class Neo4jDriver extends AbstractRiverComponent implements River {
     private static Logger logger = LoggerFactory.getLogger(Neo4jDriver.class);
 
     private final String uri;
+    private final List<Label> labels = new ArrayList<>();
     private final String index;
     private final String timestampField;
     private final int interval;
@@ -46,11 +51,19 @@ public class Neo4jDriver extends AbstractRiverComponent implements River {
         super(riverName, settings);
         this.client = client;
 
-        uri = nodeStringValue(extractValue("neo4j.uri", settings.settings()), DEFAULT_NEO_URI);
-        timestampField = nodeStringValue(extractValue("neo4j.timestampField", settings.settings()), DEFAULT_NEO_TIMESTAMP_FIELD);
-        interval = nodeIntegerValue(extractValue("neo4j.interval", settings.settings()), DEFAULT_NEO_INTERVAL);
-        index = nodeStringValue(extractValue("index.name", settings.settings()), DEFAULT_NEO_INDEX);
-        type = nodeStringValue(extractValue("index.type", settings.settings()), DEFAULT_NEO_TYPE);
+        uri = XContentMapValues.nodeStringValue(XContentMapValues.extractValue("neo4j.uri", settings.settings()), DEFAULT_NEO_URI);
+        List<Object> neo4jLabels = XContentMapValues.extractRawValues("neo4j.labels", settings.settings());
+        String label;
+        if(XContentMapValues.isArray(neo4jLabels)) {
+            for (Object neo4jLabel : neo4jLabels) {
+                label = XContentMapValues.nodeStringValue(neo4jLabel, null);
+                labels.add(DynamicLabel.label(label));
+            }
+        }
+        timestampField = XContentMapValues.nodeStringValue(XContentMapValues.extractValue("neo4j.timestampField", settings.settings()), DEFAULT_NEO_TIMESTAMP_FIELD);
+        interval = XContentMapValues.nodeIntegerValue(XContentMapValues.extractValue("neo4j.interval", settings.settings()), DEFAULT_NEO_INTERVAL);
+        index = XContentMapValues.nodeStringValue(XContentMapValues.extractValue("index.name", settings.settings()), DEFAULT_NEO_INDEX);
+        type = XContentMapValues.nodeStringValue(XContentMapValues.extractValue("index.type", settings.settings()), DEFAULT_NEO_TYPE);
 
         logger.debug("Neo4j settings [uri={}]", new Object[]{uri});
         logger.debug("River settings [indexName={}, type={}, interval={}, timestampField={}]", new Object[]{index,
@@ -66,7 +79,7 @@ public class Neo4jDriver extends AbstractRiverComponent implements River {
 
         ElasticOperationWorker worker = new ElasticOperationWorker(client);
         SpringRestGraphDatabase db = new SpringRestGraphDatabase(uri);
-        Neo4jIndexer indexer = new Neo4jIndexer(db, worker, indexingStrategy, deletingStategy, index, type);
+        Neo4jIndexer indexer = new Neo4jIndexer(db, worker, indexingStrategy, deletingStategy, index, type, labels);
         Neo4jPoller poller = new Neo4jPoller(indexer, interval);
 
         executor = Executors.newFixedThreadPool(2);

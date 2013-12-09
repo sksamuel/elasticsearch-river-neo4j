@@ -1,5 +1,7 @@
 package org.elasticsearch.plugin.river.neo4j;
 
+import java.io.IOException;
+import java.io.InputStream;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.river.RiverName;
@@ -9,26 +11,28 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.Map;
 
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.TestCase.assertFalse;
-import static org.elasticsearch.common.settings.ImmutableSettings.settingsBuilder;
+import org.elasticsearch.common.Classes;
+import org.elasticsearch.common.io.Streams;
+import org.elasticsearch.common.settings.ImmutableSettings;
+import org.elasticsearch.common.xcontent.XContentHelper;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 
 /**
  * @author Stephen Samuel
+ * @author Andre Crouch
  */
 public class Neo4jDriverTest {
 
     RiverName name = new RiverName("type", "neo4j");
     Client client = mock(Client.class);
+    private ClassLoader classLoader = Classes.getDefaultClassLoader();
 
     @Test
-    public void settingsAreTakenFromNeo4jObjectIfSet() {
-
-        Settings globalSettings = settingsBuilder().loadFromClasspath("settings.yml").build();
-        Map map = settingsBuilder().loadFromClasspath("dummy_river_settings.json").build().getAsMap();
-        RiverSettings riverSettings = new RiverSettings(globalSettings, map);
+    public void settingsAreTakenFromNeo4jObjectIfSet() throws IOException {
+        InputStream in = this.classLoader.getResourceAsStream("dummy_river_settings.json");
+        RiverSettings riverSettings = new RiverSettings(ImmutableSettings.settingsBuilder().build(), XContentHelper.convertToMap(
+                    Streams.copyToByteArray(in), false).v2());
         Neo4jDriver driver = new Neo4jDriver(name, riverSettings, "myindex", client);
 
         assertEquals("time", driver.getTimestampField());

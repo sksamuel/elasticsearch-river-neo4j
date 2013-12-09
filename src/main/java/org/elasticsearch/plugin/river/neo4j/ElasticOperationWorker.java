@@ -13,13 +13,14 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * @author Stephen Samuel
+ * @author Andre Crouch
  */
 public class ElasticOperationWorker implements Runnable {
 
     private static Logger logger = LoggerFactory.getLogger(ElasticOperationWorker.class);
     private static final ElasticOperation POISON = new NoopOperation();
 
-    private final BlockingQueue<ElasticOperation> queue = new LinkedBlockingQueue<ElasticOperation>();
+    private final BlockingQueue<ElasticOperation> queue = new LinkedBlockingQueue<>();
     private final Client client;
 
     public ElasticOperationWorker(Client client) {
@@ -88,7 +89,7 @@ class IndexOperation implements ElasticOperation {
     private final String type;
     private final Node node;
     private final long version;
-
+   
     public IndexOperation(IndexingStrategy strategy, String index, String type, Node node, long version) {
         this.strategy = strategy;
         this.index = index;
