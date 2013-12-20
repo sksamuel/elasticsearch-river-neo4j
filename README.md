@@ -21,6 +21,7 @@ The nodes will be indexed using the properties set on them, with the neo4j node 
 | Neo4j Driver Plugin | ElasticSearch | Neo4j |
 | ------ | --------- | --------- |
 | 0.90.1.x | 0.90.1 | 1.8.x |
+| 0.90.7.0 | 0.90.7 | 2.0.x |
 
 [![Build Status](https://travis-ci.org/sksamuel/elasticsearch-river-neo4j.png)](https://travis-ci.org/sksamuel/elasticsearch-river-neo4j)
 
@@ -91,7 +92,7 @@ The plugin is available on maven central.
 <dependency>
     <groupId>com.sksamuel.elasticsearch</groupId>
     <artifactId>elasticsearch-river-neo4j</artifactId>
-    <version>0.90.1.1</version>
+    <version>0.90.7.8</version>
 </dependency>
 ```
 
