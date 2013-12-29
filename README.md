@@ -22,6 +22,7 @@ The nodes will be indexed using the properties set on them, with the neo4j node 
 | ------ | --------- | --------- |
 | 0.90.1.x | 0.90.1 | 1.8.x |
 | 0.90.7.0 | 0.90.7 | 2.0.x |
+| 0.90.9.0 | 0.90.9 | 2.0.x |
 
 [![Build Status](https://travis-ci.org/sksamuel/elasticsearch-river-neo4j.png)](https://travis-ci.org/sksamuel/elasticsearch-river-neo4j)
 
