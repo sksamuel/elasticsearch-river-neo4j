@@ -16,8 +16,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.neo4j.rest.SpringRestGraphDatabase;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 import static org.elasticsearch.client.Requests.clusterHealthRequest;
@@ -97,10 +97,11 @@ public class Neo4jRiverIntTest {
         String name = UUID.randomUUID().toString();
 
         // add node to neo4j
-        Map map = new HashMap();
+        HashMap<String, Object> map = new HashMap<String, Object>();
         map.put("name", name);
         Transaction tx = db.beginTx();
-        org.neo4j.graphdb.Node n = db.createNode(map);
+        ArrayList<String> labels = new ArrayList<String>();
+		org.neo4j.graphdb.Node n = db.createNode(map, labels);
         tx.success();
 
         CountResponse resp = null;
