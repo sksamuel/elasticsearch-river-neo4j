@@ -16,15 +16,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.neo4j.rest.SpringRestGraphDatabase;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 import static org.elasticsearch.client.Requests.clusterHealthRequest;
 import static org.elasticsearch.client.Requests.countRequest;
 import static org.elasticsearch.common.io.Streams.copyToStringFromClasspath;
 import static org.elasticsearch.common.settings.ImmutableSettings.settingsBuilder;
-import static org.elasticsearch.index.query.QueryBuilders.fieldQuery;
+import static org.elasticsearch.index.query.QueryBuilders.queryString;
 import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -97,10 +97,11 @@ public class Neo4jRiverIntTest {
         String name = UUID.randomUUID().toString();
 
         // add node to neo4j
-        Map map = new HashMap();
+        HashMap<String, Object> map = new HashMap<String, Object>();
         map.put("name", name);
         Transaction tx = db.beginTx();
-        org.neo4j.graphdb.Node n = db.createNode(map);
+        ArrayList<String> labels = new ArrayList<String>();
+		org.neo4j.graphdb.Node n = db.createNode(map, labels);
         tx.success();
 
         CountResponse resp = null;
@@ -112,7 +113,7 @@ public class Neo4jRiverIntTest {
             refreshIndex();
 
             logger.debug("Count request [index={}, type={}, name={}]", new Object[]{index, type, name});
-            resp = node.client().count(countRequest(index).types(type).query(fieldQuery("name", name))).actionGet();
+            resp = node.client().count(countRequest(index).types(type).source(queryString(name).defaultField("name").toString())).actionGet();
             if (1 == resp.getCount())
                 break;
 
@@ -128,7 +129,7 @@ public class Neo4jRiverIntTest {
             refreshIndex();
 
             logger.debug("Count request [index={}, type={}, name={}]", new Object[]{index, type, name});
-            resp = node.client().count(countRequest(index).types(type).query(fieldQuery("name", name))).actionGet();
+            resp = node.client().count(countRequest(index).types(type).source(queryString(name).defaultField("name").toString())).actionGet();
             if (0 == resp.getCount())
                 break;
 
@@ -150,7 +151,7 @@ public class Neo4jRiverIntTest {
             refreshIndex();
             CountResponse
                     resp =
-                    node.client().count(countRequest(index).types(type).query(fieldQuery("manager", "mowbray"))).actionGet();
+                    node.client().count(countRequest(index).types(type).source(queryString("mowbray").defaultField("manager").toString())).actionGet();
             logger.debug("How many moggas? {} !", resp.getCount());
         }
     }

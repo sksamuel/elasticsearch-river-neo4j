@@ -20,7 +20,7 @@ public class SimpleDeletingStrategyTest {
         long id = new Random().nextInt(50000) + 1;
         DeleteByQueryRequest req = s.build("neo4j-index", "node", 12);
         assertEquals("neo4j-index", req.indices()[0]);
-        assertEquals("[[neo4j-index]][[node]], querySource[{\"range\":{\"version\":{\"from\":null,\"to\":11," +
-                "\"include_lower\":true,\"include_upper\":true}}}]", req.toString());
+        assertEquals("[[neo4j-index]][[node]], source[{\"query\":{\"range\":{\"version\":{\"from\":null,\"to\":11," +
+                "\"include_lower\":true,\"include_upper\":true}}}}]", req.toString());
     }
 }
