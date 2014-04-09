@@ -13,7 +13,7 @@
     <groupId>com.sksamuel.elasticsearch</groupId>
     <artifactId>elasticsearch-river-neo4j</artifactId>
     <packaging>jar</packaging>
-    <version>1.1.0</version>
+    <version>1.1.1</version>
     <name>elasticsearch-river-neo4j</name>
     <description>A river plugin for elastic search that offers an easy way to index neo4j graph databases</description>
     <url>https://github.com/sksamuel/elasticsearch-river-neo4j</url>
@@ -211,10 +211,24 @@
                         <encoding>UTF-8</encoding>
                     </configuration>
                 </plugin>
+                <!-- Copy dependencies into lib folder -->
+                <!-- To see full classpath use  mvn dependency:build-classpath -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
-                    <version>${maven.plugin.dependency.version}</version>
+                    <version>2.2</version>
+                    <executions>
+                        <execution>
+                            <id>copy-dependencies</id>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>copy-dependencies</goal>
+                            </goals>
+                            <configuration>
+                                <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                            </configuration>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -285,7 +299,40 @@
                         </execution>
                     </executions>
                 </plugin>
+                <!-- Generate the release zip file (run during package step) -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-assembly-plugin</artifactId>
+                    <version>2.2.1</version>
+                    <configuration>
+                        <finalName>elasticsearch-${project.name}-${elasticsearch.version}</finalName>
+                        <appendAssemblyId>false</appendAssemblyId>
+                        <outputDirectory>${project.build.directory}/release/</outputDirectory>
+                        <descriptors>
+                            <descriptor>assembly/release.xml</descriptor>
+                        </descriptors>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>generate-release-plugin</id>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>single</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
             </plugins>
         </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+            </plugin>
+        </plugins>
     </build>
 </project>
