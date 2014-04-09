@@ -289,7 +289,7 @@
                         <appendAssemblyId>false</appendAssemblyId>
                         <outputDirectory>${project.build.directory}/release/</outputDirectory>
                         <descriptors>
-                            <descriptor>assembly/release.xml</descriptor>
+                            <descriptor>src/assembly/release.xml</descriptor>
                         </descriptors>
                     </configuration>
                     <executions>
