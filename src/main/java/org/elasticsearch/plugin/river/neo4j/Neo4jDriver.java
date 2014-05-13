@@ -1,24 +1,24 @@
 package org.elasticsearch.plugin.river.neo4j;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.inject.Inject;
+import org.elasticsearch.common.xcontent.support.XContentMapValues;
 import org.elasticsearch.river.AbstractRiverComponent;
 import org.elasticsearch.river.River;
 import org.elasticsearch.river.RiverIndexName;
 import org.elasticsearch.river.RiverName;
 import org.elasticsearch.river.RiverSettings;
+import org.neo4j.graphdb.DynamicLabel;
+import org.neo4j.graphdb.Label;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.neo4j.rest.SpringRestGraphDatabase;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import org.elasticsearch.common.xcontent.support.XContentMapValues;
-import org.neo4j.graphdb.DynamicLabel;
-import org.neo4j.graphdb.Label;
 
 /**
  * @author Stephen Samuel
@@ -40,6 +40,8 @@ public class Neo4jDriver extends AbstractRiverComponent implements River {
     private final String timestampField;
     private final int interval;
     private final Client client;
+    private final String indexFromLabel;
+    private final String typeFromLabel;
     private final String type;
     ExecutorService executor;
 
@@ -64,12 +66,21 @@ public class Neo4jDriver extends AbstractRiverComponent implements River {
         interval = XContentMapValues.nodeIntegerValue(XContentMapValues.extractValue("neo4j.interval", settings.settings()), DEFAULT_NEO_INTERVAL);
         index = XContentMapValues.nodeStringValue(XContentMapValues.extractValue("index.name", settings.settings()), DEFAULT_NEO_INDEX);
         type = XContentMapValues.nodeStringValue(XContentMapValues.extractValue("index.type", settings.settings()), DEFAULT_NEO_TYPE);
+        indexFromLabel = XContentMapValues.nodeStringValue(XContentMapValues.extractValue("index.name.label",
+            settings.settings()), null);
+        typeFromLabel = XContentMapValues.nodeStringValue(XContentMapValues.extractValue("index.type.label",
+            settings.settings()), null);
 
         logger.debug("Neo4j settings [uri={}]", new Object[]{uri});
-        logger.debug("River settings [indexName={}, type={}, interval={}, timestampField={}]", new Object[]{index,
+        logger.debug("River settings [indexName={}, type={}, interval={}, timestampField={}, indexLabel={}, " +
+                "typelabel={}]",
+            new Object[]{index,
                 type,
                 interval,
-                timestampField});
+                timestampField,
+                indexFromLabel,
+                typeFromLabel}
+        );
 
     }
 

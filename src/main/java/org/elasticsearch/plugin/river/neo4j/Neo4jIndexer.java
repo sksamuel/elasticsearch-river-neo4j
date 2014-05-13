@@ -1,11 +1,12 @@
 package org.elasticsearch.plugin.river.neo4j;
 
-import java.util.List;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.neo4j.rest.SpringRestGraphDatabase;
+
+import java.util.List;
 
 /**
  * @author Stephen Samuel
@@ -24,8 +25,13 @@ public class Neo4jIndexer {
     private final String type;
     private final List<Label> labels;
 
-    public Neo4jIndexer(SpringRestGraphDatabase db, ElasticOperationWorker worker, IndexingStrategy indexingStrategy,
-                        DeletingStategy deletingStategy, String index, String type, List<Label> labels) {
+    public Neo4jIndexer(SpringRestGraphDatabase db,
+                        ElasticOperationWorker worker,
+                        IndexingStrategy indexingStrategy,
+                        DeletingStategy deletingStategy,
+                        String index,
+                        String type,
+                        List<Label> labels) {
         if (db == null) throw new IllegalStateException();
         if (worker == null) throw new IllegalStateException();
         if (indexingStrategy == null) throw new IllegalStateException();
