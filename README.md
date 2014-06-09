@@ -20,6 +20,7 @@ The nodes will be indexed using the properties set on them, with the neo4j node 
 
 | Neo4j Driver Plugin | ElasticSearch | Neo4j |
 | ------ | --------- | --------- |
+| 1.2.1 | 1.2.1 | 2.0.1
 | 1.1.0 | 1.1.0 | 2.0.1
 | 1.0.2 | 1.0.2 | 2.0.1
 | 0.90.1.x | 0.90.1 | 1.8.x |
