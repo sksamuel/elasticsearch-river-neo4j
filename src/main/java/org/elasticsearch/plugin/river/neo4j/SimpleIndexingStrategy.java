@@ -29,8 +29,13 @@ public class SimpleIndexingStrategy implements IndexingStrategy {
             src.array("labels", nodeLabels.toArray());
         }
         for (String key : node.getPropertyKeys()) {
-            String value = node.getProperty(key).toString();
-            src.field(key, value);
+            Object value = node.getProperty(key);
+            if (value instanceof Object[]) {
+                Object[] array = (Object[]) value;
+                src.field(key, array);
+            } else {
+                src.field(key, value.toString());
+            }
         }
         
         return new IndexRequest(index, type, String.valueOf(node.getId())).source(src);
