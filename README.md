@@ -102,7 +102,7 @@ The plugin is available on maven central.
 
 To install run:
 ```
-$ bin\plugin -install com.sksamuel.elasticsearch/elasticsearch-river-neo4j/0.90.7.0
+$ bin/plugin -install com.sksamuel.elasticsearch/elasticsearch-river-neo4j/1.2.1.1
 ```
 
 
