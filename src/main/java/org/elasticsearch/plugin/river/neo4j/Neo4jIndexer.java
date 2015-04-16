@@ -4,7 +4,7 @@ import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.neo4j.rest.SpringRestGraphDatabase;
+import org.springframework.data.neo4j.rest.SpringCypherRestGraphDatabase;
 
 import java.util.List;
 
@@ -17,7 +17,7 @@ public class Neo4jIndexer {
     private static final Logger logger = LoggerFactory.getLogger(Neo4jIndexer.class);
 
     long version = System.currentTimeMillis();
-    private SpringRestGraphDatabase db;
+    private SpringCypherRestGraphDatabase db;
     private ElasticOperationWorker worker;
     private final IndexingStrategy indexingStrategy;
     private final DeletingStategy deletingStategy;
@@ -25,7 +25,7 @@ public class Neo4jIndexer {
     private final String type;
     private final List<Label> labels;
 
-    public Neo4jIndexer(SpringRestGraphDatabase db,
+    public Neo4jIndexer(SpringCypherRestGraphDatabase db,
                         ElasticOperationWorker worker,
                         IndexingStrategy indexingStrategy,
                         DeletingStategy deletingStategy,

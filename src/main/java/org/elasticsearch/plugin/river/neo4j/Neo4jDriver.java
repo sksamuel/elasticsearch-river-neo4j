@@ -12,7 +12,7 @@ import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.Label;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.neo4j.rest.SpringRestGraphDatabase;
+import org.springframework.data.neo4j.rest.SpringCypherRestGraphDatabase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -89,7 +89,7 @@ public class Neo4jDriver extends AbstractRiverComponent implements River {
         logger.info("Starting neo4j river");
 
         ElasticOperationWorker worker = new ElasticOperationWorker(client);
-        SpringRestGraphDatabase db = new SpringRestGraphDatabase(uri);
+        SpringCypherRestGraphDatabase db = new SpringCypherRestGraphDatabase(uri);
         Neo4jIndexer indexer = new Neo4jIndexer(db, worker, indexingStrategy, deletingStategy, index, type, labels);
         Neo4jPoller poller = new Neo4jPoller(indexer, interval);
 
