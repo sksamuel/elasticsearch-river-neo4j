@@ -14,7 +14,7 @@ import org.junit.Test;
 import org.neo4j.graphdb.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.neo4j.rest.SpringRestGraphDatabase;
+import org.springframework.data.neo4j.rest.SpringCypherRestGraphDatabase;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,7 +39,7 @@ public class Neo4jRiverIntTest {
     private Node node;
     private String river = "neo4j-river-" + UUID.randomUUID().toString();
     private String index;
-    private SpringRestGraphDatabase db;
+    private SpringCypherRestGraphDatabase db;
     private String type;
 
     public void shutdown() {
@@ -60,7 +60,7 @@ public class Neo4jRiverIntTest {
         String uri = riverSettings.get("neo4j.uri");
 
         logger.debug("Connecting to neo4j @ {}", uri);
-        db = new SpringRestGraphDatabase(uri);
+        db = new SpringCypherRestGraphDatabase(uri);
 
         logger.debug("Starting local elastic...");
         Tuple<Settings, Environment> initialSettings = InternalSettingsPerparer.prepareSettings(globalSettings, true);

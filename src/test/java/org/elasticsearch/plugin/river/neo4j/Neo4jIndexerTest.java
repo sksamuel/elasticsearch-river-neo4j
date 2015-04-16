@@ -9,7 +9,7 @@ import org.mockito.Mockito;
 import org.neo4j.graphdb.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.neo4j.rest.SpringRestGraphDatabase;
+import org.springframework.data.neo4j.rest.SpringCypherRestGraphDatabase;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -30,13 +30,13 @@ public class Neo4jIndexerTest {
     private static final Logger logger = LoggerFactory.getLogger(Neo4jIndexerTest.class);
 
     ElasticOperationWorker worker;
-    SpringRestGraphDatabase db;
+    SpringCypherRestGraphDatabase db;
     Neo4jIndexer indexer;
 
     @Before
     public void before() {
         worker = mock(ElasticOperationWorker.class);
-        db = mock(SpringRestGraphDatabase.class);
+        db = mock(SpringCypherRestGraphDatabase.class);
         List<Label> labels = new ArrayList<>();
         labels.add(DynamicLabel.label("User"));
         indexer = new Neo4jIndexer(db, worker, new SimpleIndexingStrategy(), new SimpleDeletingStrategy(), "myindex", "mytype", labels);
