@@ -1,6 +1,9 @@
 Neo4j River Plugin for ElasticSearch
 =========================
 
+**Rivers are deprecated in Elasticsearch 1.5 and will be removed in 2.0. Therefore, this plugin will no longer be maintained.
+https://www.elastic.co/blog/deprecating_rivers**
+
 Neo4j River Plugin is a river module for Elasticsearch that will continuously poll a neo4j server and index the nodes for searching inside elastic search. The period betweens polls can be configured. All nodes will be updated on each poll, and any deleted nodes since the last poll will be removed from the index. Versioning is used to identify which nodes have been removed since the last poll.
 
 The nodes will be indexed using the properties set on them, with the neo4j node id being the id used inside elastic. So if you have a node of _id=7_ with the properties _name=sam_ and _location=london_ then the elastic search index request would look like
